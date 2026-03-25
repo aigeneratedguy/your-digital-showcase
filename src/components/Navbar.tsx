@@ -90,6 +90,20 @@ const Navbar = () => {
             </Link>
           ))}
           <Link
+            to="/order-confirmation"
+            onClick={() => setMobileOpen(false)}
+            className="block py-2 text-sm font-medium text-foreground hover:text-primary"
+          >
+            Order Status
+          </Link>
+          <Link
+            to="/admin"
+            onClick={() => setMobileOpen(false)}
+            className="block py-2 text-sm font-medium text-foreground hover:text-primary"
+          >
+            Admin Panel
+          </Link>
+          <Link
             to="/signin"
             onClick={() => setMobileOpen(false)}
             className="block py-2 text-sm font-medium text-primary"
