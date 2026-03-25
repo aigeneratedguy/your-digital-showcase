@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Search, User, Menu, X } from "lucide-react";
+import { Search, User, Menu, X, ShieldCheck, ShoppingBag } from "lucide-react";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -46,6 +46,20 @@ const Navbar = () => {
             <Search className="w-4 h-4 text-primary" />
           </div>
           <Link
+            to="/order-confirmation"
+            className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
+            title="Order Status"
+          >
+            <ShoppingBag className="w-4 h-4" />
+          </Link>
+          <Link
+            to="/admin"
+            className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
+            title="Admin Panel"
+          >
+            <ShieldCheck className="w-4 h-4" />
+          </Link>
+          <Link
             to="/signin"
             className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
           >
@@ -75,6 +89,20 @@ const Navbar = () => {
               {link.label}
             </Link>
           ))}
+          <Link
+            to="/order-confirmation"
+            onClick={() => setMobileOpen(false)}
+            className="block py-2 text-sm font-medium text-foreground hover:text-primary"
+          >
+            Order Status
+          </Link>
+          <Link
+            to="/admin"
+            onClick={() => setMobileOpen(false)}
+            className="block py-2 text-sm font-medium text-foreground hover:text-primary"
+          >
+            Admin Panel
+          </Link>
           <Link
             to="/signin"
             onClick={() => setMobileOpen(false)}
