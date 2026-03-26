@@ -22,6 +22,7 @@ const menuItems = [
 
 const MenuSection = () => {
   const [activeCategory, setActiveCategory] = useState("All");
+  const { addItem } = useCart();
 
   const filtered = activeCategory === "All"
     ? menuItems
