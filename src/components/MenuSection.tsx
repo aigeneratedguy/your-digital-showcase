@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Star } from "lucide-react";
+import { Star, Plus } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
 import foodBreakfast from "@/assets/food-breakfast.jpg";
 import foodLunch from "@/assets/food-lunch.jpg";
 import foodDinner from "@/assets/food-dinner.jpg";
