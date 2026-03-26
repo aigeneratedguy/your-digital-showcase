@@ -79,11 +79,20 @@ const MenuSection = () => {
               </div>
               <div className="mt-4 text-center">
                 <h3 className="font-heading font-bold text-lg text-foreground">{item.name}</h3>
-                <p className="text-primary font-bold mt-1">{item.price}</p>
+                <p className="text-primary font-bold mt-1">${item.price.toFixed(2)}</p>
                 <div className="flex items-center justify-center gap-1 mt-2">
                   <span className="text-primary font-semibold">{item.rating}</span>
                   <Star className="w-4 h-4 fill-primary text-primary" />
                 </div>
+                <button
+                  onClick={() => {
+                    addItem({ name: item.name, price: item.price, image: item.image });
+                    toast.success(`${item.name} added to cart`);
+                  }}
+                  className="mt-3 inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold shadow hover:bg-primary/90 transition-all duration-200"
+                >
+                  <Plus className="w-4 h-4" /> Add to Cart
+                </button>
               </div>
             </div>
           ))}
