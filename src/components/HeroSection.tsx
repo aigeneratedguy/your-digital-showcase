@@ -20,7 +20,7 @@ const HeroSection = () => {
             So long as you have food in your mouth, you have solved all the problems for the time being.
           </p>
           <Link
-            to="/menu"
+            to="/order-confirmation"
             className="inline-block mt-8 px-8 py-3 rounded-full bg-card border border-border text-primary font-semibold shadow-md hover:shadow-lg hover:bg-primary hover:text-primary-foreground transition-all duration-300"
           >
             Order Now
