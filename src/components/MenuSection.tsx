@@ -12,12 +12,12 @@ import foodBeverage from "@/assets/food-beverage.jpg";
 const categories = ["All", "Breakfast", "Lunch", "Dinner", "Beverages", "Desserts"];
 
 const menuItems = [
-  { name: "Herb Omelette", category: "Breakfast", rating: 4.3, price: "₹149", image: foodBreakfast },
-  { name: "Club Sandwich", category: "Lunch", rating: 5.0, price: "₹199", image: foodLunch },
-  { name: "Fruit Salad Bowl", category: "Dinner", rating: 5.0, price: "₹179", image: foodDinner },
-  { name: "Chicken Pasta", category: "Lunch", rating: 4.7, price: "₹249", image: foodPasta },
-  { name: "Chocolate Lava Cake", category: "Desserts", rating: 4.9, price: "₹159", image: foodDessert },
-  { name: "Fresh Smoothies", category: "Beverages", rating: 4.5, price: "₹129", image: foodBeverage },
+  { name: "Herb Omelette", category: "Breakfast", rating: 4.3, price: 5.99, image: foodBreakfast },
+  { name: "Club Sandwich", category: "Lunch", rating: 5.0, price: 7.99, image: foodLunch },
+  { name: "Fruit Salad Bowl", category: "Dinner", rating: 5.0, price: 6.49, image: foodDinner },
+  { name: "Chicken Pasta", category: "Lunch", rating: 4.7, price: 9.99, image: foodPasta },
+  { name: "Chocolate Lava Cake", category: "Desserts", rating: 4.9, price: 5.49, image: foodDessert },
+  { name: "Fresh Smoothies", category: "Beverages", rating: 4.5, price: 4.99, image: foodBeverage },
 ];
 
 const MenuSection = () => {
