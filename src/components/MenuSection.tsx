@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Star } from "lucide-react";
+import { Star, Plus } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
 import foodBreakfast from "@/assets/food-breakfast.jpg";
 import foodLunch from "@/assets/food-lunch.jpg";
 import foodDinner from "@/assets/food-dinner.jpg";
@@ -10,16 +12,17 @@ import foodBeverage from "@/assets/food-beverage.jpg";
 const categories = ["All", "Breakfast", "Lunch", "Dinner", "Beverages", "Desserts"];
 
 const menuItems = [
-  { name: "Herb Omelette", category: "Breakfast", rating: 4.3, price: "₹149", image: foodBreakfast },
-  { name: "Club Sandwich", category: "Lunch", rating: 5.0, price: "₹199", image: foodLunch },
-  { name: "Fruit Salad Bowl", category: "Dinner", rating: 5.0, price: "₹179", image: foodDinner },
-  { name: "Chicken Pasta", category: "Lunch", rating: 4.7, price: "₹249", image: foodPasta },
-  { name: "Chocolate Lava Cake", category: "Desserts", rating: 4.9, price: "₹159", image: foodDessert },
-  { name: "Fresh Smoothies", category: "Beverages", rating: 4.5, price: "₹129", image: foodBeverage },
+  { name: "Herb Omelette", category: "Breakfast", rating: 4.3, price: 5.99, image: foodBreakfast },
+  { name: "Club Sandwich", category: "Lunch", rating: 5.0, price: 7.99, image: foodLunch },
+  { name: "Fruit Salad Bowl", category: "Dinner", rating: 5.0, price: 6.49, image: foodDinner },
+  { name: "Chicken Pasta", category: "Lunch", rating: 4.7, price: 9.99, image: foodPasta },
+  { name: "Chocolate Lava Cake", category: "Desserts", rating: 4.9, price: 5.49, image: foodDessert },
+  { name: "Fresh Smoothies", category: "Beverages", rating: 4.5, price: 4.99, image: foodBeverage },
 ];
 
 const MenuSection = () => {
   const [activeCategory, setActiveCategory] = useState("All");
+  const { addItem } = useCart();
 
   const filtered = activeCategory === "All"
     ? menuItems
@@ -76,11 +79,20 @@ const MenuSection = () => {
               </div>
               <div className="mt-4 text-center">
                 <h3 className="font-heading font-bold text-lg text-foreground">{item.name}</h3>
-                <p className="text-primary font-bold mt-1">{item.price}</p>
+                <p className="text-primary font-bold mt-1">${item.price.toFixed(2)}</p>
                 <div className="flex items-center justify-center gap-1 mt-2">
                   <span className="text-primary font-semibold">{item.rating}</span>
                   <Star className="w-4 h-4 fill-primary text-primary" />
                 </div>
+                <button
+                  onClick={() => {
+                    addItem({ name: item.name, price: item.price, image: item.image });
+                    toast.success(`${item.name} added to cart`);
+                  }}
+                  className="mt-3 inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold shadow hover:bg-primary/90 transition-all duration-200"
+                >
+                  <Plus className="w-4 h-4" /> Add to Cart
+                </button>
               </div>
             </div>
           ))}

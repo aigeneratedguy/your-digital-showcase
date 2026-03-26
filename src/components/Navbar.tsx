@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Search, User, Menu, X, ShieldCheck, ShoppingBag } from "lucide-react";
+import CartDrawer from "@/components/CartDrawer";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -45,6 +46,7 @@ const Navbar = () => {
             />
             <Search className="w-4 h-4 text-primary" />
           </div>
+          <CartDrawer />
           <Link
             to="/order-confirmation"
             className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"

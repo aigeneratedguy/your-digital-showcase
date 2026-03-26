@@ -4,21 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { useCart } from "@/contexts/CartContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const orderItems = [
-  { name: "Grilled Chicken Salad", qty: 1, price: 12.99 },
-  { name: "Margherita Pizza", qty: 2, price: 14.99 },
-  { name: "Chocolate Lava Cake", qty: 1, price: 8.99 },
-  { name: "Fresh Orange Juice", qty: 2, price: 4.99 },
-];
-
 const OrderConfirmation = () => {
-  const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const { items, subtotal, clearCart } = useCart();
   const tax = subtotal * 0.08;
-  const deliveryFee = 3.99;
+  const deliveryFee = items.length > 0 ? 3.99 : 0;
   const total = subtotal + tax + deliveryFee;
+  const orderNumber = `FD-${Date.now().toString(36).toUpperCase()}`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -36,7 +31,7 @@ const OrderConfirmation = () => {
             Thank you for your order. Your food is being prepared.
           </p>
           <Badge className="mt-3 bg-primary/15 text-primary border-primary/30 text-sm px-4 py-1">
-            Order #FD-20250325-0042
+            Order #{orderNumber}
           </Badge>
         </div>
 
@@ -66,10 +61,7 @@ const OrderConfirmation = () => {
             </div>
             <div className="flex mt-2 px-5">
               {[0, 1, 2].map((i) => (
-                <div
-                  key={i}
-                  className={`flex-1 h-1 rounded ${i === 0 ? "bg-primary" : "bg-muted"}`}
-                />
+                <div key={i} className={`flex-1 h-1 rounded ${i === 0 ? "bg-primary" : "bg-muted"}`} />
               ))}
             </div>
           </CardContent>
@@ -81,31 +73,42 @@ const OrderConfirmation = () => {
             <CardTitle className="text-lg">Order Summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {orderItems.map((item, i) => (
-              <div key={i} className="flex justify-between items-center">
-                <div>
-                  <p className="font-medium text-foreground">{item.name}</p>
-                  <p className="text-sm text-muted-foreground">Qty: {item.qty}</p>
+            {items.length === 0 ? (
+              <p className="text-muted-foreground text-center py-4">No items in your order. Add items from the menu first.</p>
+            ) : (
+              <>
+                {items.map((item, i) => (
+                  <div key={i} className="flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-card">
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">{item.name}</p>
+                        <p className="text-sm text-muted-foreground">Qty: {item.qty}</p>
+                      </div>
+                    </div>
+                    <p className="font-semibold text-foreground">${(item.price * item.qty).toFixed(2)}</p>
+                  </div>
+                ))}
+                <Separator />
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Subtotal</span><span>${subtotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Tax (8%)</span><span>${tax.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Delivery Fee</span><span>${deliveryFee.toFixed(2)}</span>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between font-bold text-lg text-foreground">
+                    <span>Total</span><span>${total.toFixed(2)}</span>
+                  </div>
                 </div>
-                <p className="font-semibold text-foreground">${(item.price * item.qty).toFixed(2)}</p>
-              </div>
-            ))}
-            <Separator />
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between text-muted-foreground">
-                <span>Subtotal</span><span>${subtotal.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-muted-foreground">
-                <span>Tax (8%)</span><span>${tax.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-muted-foreground">
-                <span>Delivery Fee</span><span>${deliveryFee.toFixed(2)}</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between font-bold text-lg text-foreground">
-                <span>Total</span><span>${total.toFixed(2)}</span>
-              </div>
-            </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -143,7 +146,7 @@ const OrderConfirmation = () => {
           <Button variant="outline" asChild>
             <Link to="/"><ArrowLeft className="w-4 h-4 mr-2" /> Back to Home</Link>
           </Button>
-          <Button asChild>
+          <Button onClick={clearCart} asChild>
             <Link to="/">Order Again</Link>
           </Button>
         </div>
