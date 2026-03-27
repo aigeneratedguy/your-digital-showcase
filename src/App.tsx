@@ -9,6 +9,10 @@ import SignIn from "./pages/SignIn.tsx";
 import SignUp from "./pages/SignUp.tsx";
 import OrderConfirmation from "./pages/OrderConfirmation.tsx";
 import Admin from "./pages/Admin.tsx";
+import About from "./pages/About.tsx";
+import Team from "./pages/Team.tsx";
+import Testimonials from "./pages/Testimonials.tsx";
+import Contact from "./pages/Contact.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -26,6 +30,10 @@ const App = () => (
             <Route path="/signup" element={<SignUp />} />
             <Route path="/order-confirmation" element={<OrderConfirmation />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/team" element={<Team />} />
+            <Route path="/testimonials" element={<Testimonials />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
