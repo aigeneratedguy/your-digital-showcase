@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Search, User, Menu, X, ShieldCheck, ShoppingBag } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Search, User, Menu, X, ShieldCheck, ShoppingBag, LogOut } from "lucide-react";
 import CartDrawer from "@/components/CartDrawer";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -14,6 +16,14 @@ const navLinks = [
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Signed out");
+    navigate("/");
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border">
@@ -61,12 +71,22 @@ const Navbar = () => {
           >
             <ShieldCheck className="w-4 h-4" />
           </Link>
-          <Link
-            to="/signin"
-            className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
-          >
-            <User className="w-4 h-4" />
-          </Link>
+          {user ? (
+            <button
+              onClick={handleSignOut}
+              className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground hover:brightness-110 transition-all"
+              title="Sign Out"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          ) : (
+            <Link
+              to="/signin"
+              className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              <User className="w-4 h-4" />
+            </Link>
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -105,13 +125,22 @@ const Navbar = () => {
           >
             Admin Panel
           </Link>
-          <Link
-            to="/signin"
-            onClick={() => setMobileOpen(false)}
-            className="block py-2 text-sm font-medium text-primary"
-          >
-            Sign In
-          </Link>
+          {user ? (
+            <button
+              onClick={() => { handleSignOut(); setMobileOpen(false); }}
+              className="block py-2 text-sm font-medium text-destructive hover:underline"
+            >
+              Sign Out
+            </button>
+          ) : (
+            <Link
+              to="/signin"
+              onClick={() => setMobileOpen(false)}
+              className="block py-2 text-sm font-medium text-primary"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
       )}
     </nav>
