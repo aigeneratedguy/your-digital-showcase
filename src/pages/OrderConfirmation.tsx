@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { CheckCircle, Clock, MapPin, Phone, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,15 +6,55 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 const OrderConfirmation = () => {
   const { items, subtotal, clearCart } = useCart();
+  const { user } = useAuth();
+  const [orderSaved, setOrderSaved] = useState(false);
   const tax = subtotal * 0.08;
   const deliveryFee = items.length > 0 ? 3.99 : 0;
   const total = subtotal + tax + deliveryFee;
   const orderNumber = `FD-${Date.now().toString(36).toUpperCase()}`;
+
+  useEffect(() => {
+    const saveOrder = async () => {
+      if (!user || items.length === 0 || orderSaved) return;
+      const { data: order, error } = await supabase
+        .from("orders")
+        .insert({
+          user_id: user.id,
+          subtotal: Number(subtotal.toFixed(2)),
+          tax: Number(tax.toFixed(2)),
+          delivery_fee: Number(deliveryFee.toFixed(2)),
+          total: Number(total.toFixed(2)),
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Failed to save order:", error);
+        return;
+      }
+
+      const orderItems = items.map((item) => ({
+        order_id: order.id,
+        menu_item_name: item.name,
+        quantity: item.qty,
+        price: item.price,
+      }));
+
+      await supabase.from("order_items").insert(orderItems);
+      setOrderSaved(true);
+      toast.success("Order saved to your account!");
+    };
+
+    saveOrder();
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-background">
