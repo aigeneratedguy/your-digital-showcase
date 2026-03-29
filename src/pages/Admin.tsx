@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import {
   LayoutDashboard, ShoppingBag, UtensilsCrossed, Users, Settings,
-  TrendingUp, Clock, CheckCircle, XCircle, ArrowLeft, Menu, X,
+  TrendingUp, Clock, CheckCircle, XCircle, ArrowLeft, Menu, X, ShieldAlert,
 } from "lucide-react";
+import { useAdminRole } from "@/hooks/useAdminRole";
+import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
