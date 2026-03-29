@@ -57,6 +57,31 @@ const statusColor = (status: string) => {
 const Admin = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, loading: authLoading } = useAuth();
+  const { isAdmin, loading: roleLoading } = useAdminRole();
+
+  if (authLoading || roleLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/signin" replace />;
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
+        <ShieldAlert className="w-16 h-16 text-destructive" />
+        <h1 className="text-2xl font-bold text-foreground">Access Denied</h1>
+        <p className="text-muted-foreground">You don't have admin privileges.</p>
+        <Link to="/" className="text-primary hover:underline">Go back home</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex">
