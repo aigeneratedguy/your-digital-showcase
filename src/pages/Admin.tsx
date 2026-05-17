@@ -3,6 +3,7 @@ import { Link, Navigate } from "react-router-dom";
 import {
   LayoutDashboard, ShoppingBag, UtensilsCrossed, Users, Settings,
   TrendingUp, Clock, ArrowLeft, Menu, X, ShieldAlert, Plus, Trash2, Pencil,
+  Eye, Truck, User, Phone, MapPin,
 } from "lucide-react";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { useAuth } from "@/contexts/AuthContext";
