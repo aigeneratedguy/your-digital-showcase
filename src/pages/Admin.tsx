@@ -88,7 +88,7 @@ const Admin = () => {
     );
   }
 
-  if (!user) return <Navigate to="/signin" replace />;
+  if (!user) return <Navigate to="/admin/signin" replace />;
 
   if (!isAdmin) {
     return (
