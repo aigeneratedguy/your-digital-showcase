@@ -10,6 +10,7 @@ import SignIn from "./pages/SignIn.tsx";
 import SignUp from "./pages/SignUp.tsx";
 import OrderConfirmation from "./pages/OrderConfirmation.tsx";
 import Admin from "./pages/Admin.tsx";
+import AdminSignIn from "./pages/AdminSignIn.tsx";
 import About from "./pages/About.tsx";
 import Team from "./pages/Team.tsx";
 import Testimonials from "./pages/Testimonials.tsx";
