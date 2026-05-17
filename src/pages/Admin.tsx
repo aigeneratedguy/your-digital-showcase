@@ -240,9 +240,21 @@ const DashboardView = () => {
   );
 };
 
+type OrderItem = {
+  id: string;
+  menu_item_name: string;
+  quantity: number;
+  price: number;
+};
+
 const OrdersView = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [customer, setCustomer] = useState<Profile | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
   const { toast } = useToast();
 
   const load = async () => {
@@ -262,57 +274,166 @@ const OrdersView = () => {
     } else {
       toast({ title: "Order updated" });
       load();
+      if (selectedOrder?.id === id) setSelectedOrder({ ...selectedOrder, status });
     }
   };
 
+  const openDetail = async (order: Order) => {
+    setSelectedOrder(order);
+    setDetailOpen(true);
+    setDetailLoading(true);
+    setOrderItems([]);
+    setCustomer(null);
+    const [{ data: items }, { data: profile }] = await Promise.all([
+      supabase.from("order_items").select("*").eq("order_id", order.id),
+      supabase.from("profiles").select("*").eq("user_id", order.user_id).maybeSingle(),
+    ]);
+    setOrderItems((items as OrderItem[]) || []);
+    setCustomer((profile as Profile) || null);
+    setDetailLoading(false);
+  };
+
+  const dispatchOrder = (id: string) => updateStatus(id, "On the Way");
+
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg">All Orders</CardTitle>
-        <Badge className="bg-primary/15 text-primary border-primary/30">{orders.length} orders</Badge>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <p className="text-muted-foreground text-center py-8">Loading...</p>
-        ) : orders.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">No orders yet.</p>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order ID</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Subtotal</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {orders.map((o) => (
-                <TableRow key={o.id}>
-                  <TableCell className="font-medium">#{o.id.slice(0, 8)}</TableCell>
-                  <TableCell>{new Date(o.created_at).toLocaleDateString()}</TableCell>
-                  <TableCell>${Number(o.subtotal).toFixed(2)}</TableCell>
-                  <TableCell>${Number(o.total).toFixed(2)}</TableCell>
-                  <TableCell>
-                    <Select value={o.status} onValueChange={(v) => updateStatus(o.id, v)}>
-                      <SelectTrigger className="w-36">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ORDER_STATUSES.map(s => (
-                          <SelectItem key={s} value={s}>{s}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
+    <>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-lg">All Orders</CardTitle>
+          <Badge className="bg-primary/15 text-primary border-primary/30">{orders.length} orders</Badge>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <p className="text-muted-foreground text-center py-8">Loading...</p>
+          ) : orders.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">No orders yet.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Order ID</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Subtotal</TableHead>
+                  <TableHead>Total</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </CardContent>
-    </Card>
+              </TableHeader>
+              <TableBody>
+                {orders.map((o) => (
+                  <TableRow key={o.id}>
+                    <TableCell className="font-medium">#{o.id.slice(0, 8)}</TableCell>
+                    <TableCell>{new Date(o.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell>${Number(o.subtotal).toFixed(2)}</TableCell>
+                    <TableCell>${Number(o.total).toFixed(2)}</TableCell>
+                    <TableCell>
+                      <Select value={o.status} onValueChange={(v) => updateStatus(o.id, v)}>
+                        <SelectTrigger className="w-36">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {ORDER_STATUSES.map(s => (
+                            <SelectItem key={s} value={s}>{s}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="outline" size="sm" onClick={() => openDetail(o)}>
+                        <Eye className="w-4 h-4 mr-1" /> View
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              Order #{selectedOrder?.id.slice(0, 8)}
+              {selectedOrder && (
+                <Badge variant="outline" className={statusColor(selectedOrder.status)}>
+                  {selectedOrder.status}
+                </Badge>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+
+          {detailLoading || !selectedOrder ? (
+            <p className="text-muted-foreground text-center py-8">Loading...</p>
+          ) : (
+            <div className="space-y-5 py-2">
+              <div>
+                <h3 className="text-sm font-semibold mb-2 text-muted-foreground uppercase tracking-wide">Customer</h3>
+                <div className="space-y-2 text-sm bg-muted/40 rounded-lg p-4">
+                  <div className="flex items-start gap-2">
+                    <User className="w-4 h-4 mt-0.5 text-primary" />
+                    <span className="font-medium">{customer?.name || "—"}</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Phone className="w-4 h-4 mt-0.5 text-primary" />
+                    <span>{customer?.mobile || "—"}</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-4 h-4 mt-0.5 text-primary" />
+                    <span>{customer?.address || "—"}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold mb-2 text-muted-foreground uppercase tracking-wide">Items</h3>
+                {orderItems.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No items found.</p>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Item</TableHead>
+                        <TableHead className="text-center">Qty</TableHead>
+                        <TableHead className="text-right">Price</TableHead>
+                        <TableHead className="text-right">Subtotal</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {orderItems.map((it) => (
+                        <TableRow key={it.id}>
+                          <TableCell className="font-medium">{it.menu_item_name}</TableCell>
+                          <TableCell className="text-center">{it.quantity}</TableCell>
+                          <TableCell className="text-right">${Number(it.price).toFixed(2)}</TableCell>
+                          <TableCell className="text-right">${(Number(it.price) * it.quantity).toFixed(2)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </div>
+
+              <div className="space-y-1 text-sm border-t pt-4">
+                <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>${Number(selectedOrder.subtotal).toFixed(2)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Tax</span><span>${Number(selectedOrder.tax).toFixed(2)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Delivery</span><span>${Number(selectedOrder.delivery_fee).toFixed(2)}</span></div>
+                <div className="flex justify-between font-bold text-base pt-2 border-t"><span>Total</span><span>${Number(selectedOrder.total).toFixed(2)}</span></div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => setDetailOpen(false)}>Close</Button>
+            {selectedOrder && selectedOrder.status === "Preparing" && (
+              <Button onClick={() => dispatchOrder(selectedOrder.id)}>
+                <Truck className="w-4 h-4 mr-2" /> Dispatch Order
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
