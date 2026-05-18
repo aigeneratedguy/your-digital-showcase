@@ -11,6 +11,7 @@ import SignUp from "./pages/SignUp.tsx";
 import OrderConfirmation from "./pages/OrderConfirmation.tsx";
 import Admin from "./pages/Admin.tsx";
 import AdminSignIn from "./pages/AdminSignIn.tsx";
+import AdminSignUp from "./pages/AdminSignUp.tsx";
 import About from "./pages/About.tsx";
 import Team from "./pages/Team.tsx";
 import Testimonials from "./pages/Testimonials.tsx";
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/signup" element={<SignUp />} />
               <Route path="/order-confirmation" element={<OrderConfirmation />} />
               <Route path="/admin/signin" element={<AdminSignIn />} />
+              <Route path="/admin/signup" element={<AdminSignUp />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/about" element={<About />} />
               <Route path="/team" element={<Team />} />
