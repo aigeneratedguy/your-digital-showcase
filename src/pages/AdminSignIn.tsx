@@ -125,6 +125,12 @@ const AdminSignIn = () => {
           </form>
 
           <p className="text-center mt-6 text-xs text-muted-foreground">
+            Need an admin account?{" "}
+            <Link to="/admin/signup" className="text-primary font-semibold hover:underline">
+              Sign up
+            </Link>
+          </p>
+          <p className="text-center mt-2 text-xs text-muted-foreground">
             Not an admin?{" "}
             <Link to="/signin" className="text-primary font-semibold hover:underline">
               Customer sign in
