@@ -3,7 +3,7 @@ import { Link, Navigate } from "react-router-dom";
 import {
   LayoutDashboard, ShoppingBag, UtensilsCrossed, Users, Settings,
   TrendingUp, Clock, ArrowLeft, Menu, X, ShieldAlert, Plus, Trash2, Pencil,
-  Eye, Truck, User, Phone, MapPin,
+  Eye, Truck, User, Phone, MapPin, PlusCircle,
 } from "lucide-react";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { useAuth } from "@/contexts/AuthContext";
@@ -59,6 +59,7 @@ const sidebarItems = [
   { label: "Dashboard", icon: LayoutDashboard, id: "dashboard" },
   { label: "Orders", icon: ShoppingBag, id: "orders" },
   { label: "Menu Items", icon: UtensilsCrossed, id: "menu" },
+  { label: "Add Food", icon: PlusCircle, id: "add-food" },
   { label: "Customers", icon: Users, id: "customers" },
   { label: "Settings", icon: Settings, id: "settings" },
 ];
@@ -156,6 +157,7 @@ const Admin = () => {
           {activeTab === "dashboard" && <DashboardView />}
           {activeTab === "orders" && <OrdersView />}
           {activeTab === "menu" && <MenuView />}
+          {activeTab === "add-food" && <AddFoodView onAdded={() => setActiveTab("menu")} />}
           {activeTab === "customers" && <CustomersView />}
           {activeTab === "settings" && <SettingsView />}
         </div>
