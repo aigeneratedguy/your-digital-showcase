@@ -9,7 +9,13 @@ import Index from "./pages/Index.tsx";
 import SignIn from "./pages/SignIn.tsx";
 import SignUp from "./pages/SignUp.tsx";
 import OrderConfirmation from "./pages/OrderConfirmation.tsx";
-import Admin from "./pages/Admin.tsx";
+import AdminLayout from "./components/admin/AdminLayout.tsx";
+import AdminDashboard from "./pages/admin/Dashboard.tsx";
+import AdminOrders from "./pages/admin/Orders.tsx";
+import AdminMenuItems from "./pages/admin/MenuItems.tsx";
+import AdminAddFood from "./pages/admin/AddFood.tsx";
+import AdminCustomers from "./pages/admin/Customers.tsx";
+import AdminSettings from "./pages/admin/AdminSettings.tsx";
 import AdminSignIn from "./pages/AdminSignIn.tsx";
 import AdminSignUp from "./pages/AdminSignUp.tsx";
 import About from "./pages/About.tsx";
@@ -35,7 +41,14 @@ const App = () => (
               <Route path="/order-confirmation" element={<OrderConfirmation />} />
               <Route path="/admin/signin" element={<AdminSignIn />} />
               <Route path="/admin/signup" element={<AdminSignUp />} />
-              <Route path="/admin" element={<Admin />} />
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="orders" element={<AdminOrders />} />
+                <Route path="menu" element={<AdminMenuItems />} />
+                <Route path="add-food" element={<AdminAddFood />} />
+                <Route path="customers" element={<AdminCustomers />} />
+                <Route path="settings" element={<AdminSettings />} />
+              </Route>
               <Route path="/about" element={<About />} />
               <Route path="/team" element={<Team />} />
               <Route path="/testimonials" element={<Testimonials />} />
