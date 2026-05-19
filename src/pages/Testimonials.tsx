@@ -3,12 +3,12 @@ import Footer from "@/components/Footer";
 import { Star } from "lucide-react";
 
 const testimonials = [
-  { name: "Sarah M.", rating: 5, text: "Absolutely love FoodServe! The food is always fresh and arrives hot. Their butter chicken is to die for!" },
+  { name: "Arun S.", rating: 5, text: "Absolutely love FoodServe! The food is always fresh and arrives hot. Their butter chicken is to die for!" },
   { name: "Raj K.", rating: 5, text: "Best online food service I've used. The menu variety is incredible and ordering is so easy." },
-  { name: "Emily T.", rating: 4, text: "Great quality meals at reasonable prices. The delivery is always on time. Highly recommend!" },
-  { name: "Michael B.", rating: 5, text: "As a busy professional, FoodServe has been a lifesaver. Healthy, delicious meals delivered right to my door." },
-  { name: "Priya S.", rating: 4, text: "The vegetarian options are fantastic. Finally a service that takes veggie meals seriously!" },
-  { name: "Tom W.", rating: 5, text: "I've tried many food delivery services and FoodServe is hands down the best. The pasta dishes are restaurant quality." },
+  { name: "Anjali T.", rating: 4, text: "Great quality meals at reasonable prices. The delivery is always on time. Highly recommend!" },
+  { name: "Bhumika R.", rating: 5, text: "As a busy professional, FoodServe has been a lifesaver. Healthy, delicious meals delivered right to my door." },
+  { name: "Ajay K.", rating: 4, text: "The vegetarian options are fantastic. Finally a service that takes veggie meals seriously!" },
+  { name: "Priya S.", rating: 5, text: "I've tried many food delivery services and FoodServe is hands down the best. The pasta dishes are restaurant quality." },
 ];
 
 const Testimonials = () => {
