@@ -4,7 +4,7 @@ import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatINR } from "@/lib/format";
-import placeholder from "/placeholder.svg";
+const placeholder = "/placeholder.svg";
 
 type DbMenuItem = {
   id: string;
