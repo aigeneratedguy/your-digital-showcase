@@ -1,32 +1,56 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Star, Plus } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
-import foodBreakfast from "@/assets/food-breakfast.jpg";
-import foodLunch from "@/assets/food-lunch.jpg";
-import foodDinner from "@/assets/food-dinner.jpg";
-import foodPasta from "@/assets/food-pasta.jpg";
-import foodDessert from "@/assets/food-dessert.jpg";
-import foodBeverage from "@/assets/food-beverage.jpg";
+import { supabase } from "@/integrations/supabase/client";
+import { formatINR } from "@/lib/format";
+const placeholder = "/placeholder.svg";
 
-const categories = ["All", "Breakfast", "Lunch", "Dinner", "Beverages", "Desserts"];
-
-const menuItems = [
-  { name: "Herb Omelette", category: "Breakfast", rating: 4.3, price: 5.99, image: foodBreakfast },
-  { name: "Club Sandwich", category: "Lunch", rating: 5.0, price: 7.99, image: foodLunch },
-  { name: "Fruit Salad Bowl", category: "Dinner", rating: 5.0, price: 6.49, image: foodDinner },
-  { name: "Chicken Pasta", category: "Lunch", rating: 4.7, price: 9.99, image: foodPasta },
-  { name: "Chocolate Lava Cake", category: "Desserts", rating: 4.9, price: 5.49, image: foodDessert },
-  { name: "Fresh Smoothies", category: "Beverages", rating: 4.5, price: 4.99, image: foodBeverage },
-];
+type DbMenuItem = {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  rating: number | null;
+  image_url: string | null;
+  available: boolean | null;
+};
 
 const MenuSection = () => {
+  const [items, setItems] = useState<DbMenuItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("All");
   const { addItem } = useCart();
 
-  const filtered = activeCategory === "All"
-    ? menuItems
-    : menuItems.filter((item) => item.category === activeCategory);
+  const load = async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("menu_items")
+      .select("*")
+      .eq("available", true)
+      .order("created_at", { ascending: false });
+    setItems((data as DbMenuItem[]) || []);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+    const channel = supabase
+      .channel("menu_items_changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "menu_items" }, load)
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    items.forEach((i) => set.add(i.category));
+    return ["All", ...Array.from(set)];
+  }, [items]);
+
+  const filtered = activeCategory === "All" ? items : items.filter((i) => i.category === activeCategory);
 
   return (
     <section className="py-16 md:py-24 bg-secondary/30" id="menu">
@@ -43,7 +67,6 @@ const MenuSection = () => {
           <div className="section-divider mt-3" />
         </div>
 
-        {/* Category filters */}
         <div className="flex flex-wrap justify-center gap-3 mb-12">
           {categories.map((cat) => (
             <button
@@ -60,43 +83,48 @@ const MenuSection = () => {
           ))}
         </div>
 
-        {/* Food grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filtered.map((item) => (
-            <div
-              key={item.name}
-              className="flex flex-col items-center group"
-            >
-              <div className="w-56 h-56 rounded-full overflow-hidden shadow-lg border-4 border-card group-hover:shadow-2xl group-hover:scale-105 transition-all duration-300">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  width={640}
-                  height={640}
-                />
-              </div>
-              <div className="mt-4 text-center">
-                <h3 className="font-heading font-bold text-lg text-foreground">{item.name}</h3>
-                <p className="text-primary font-bold mt-1">${item.price.toFixed(2)}</p>
-                <div className="flex items-center justify-center gap-1 mt-2">
-                  <span className="text-primary font-semibold">{item.rating}</span>
-                  <Star className="w-4 h-4 fill-primary text-primary" />
+        {loading ? (
+          <p className="text-center text-muted-foreground">Loading menu...</p>
+        ) : filtered.length === 0 ? (
+          <p className="text-center text-muted-foreground">No items available right now.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filtered.map((item) => {
+              const image = item.image_url || placeholder;
+              return (
+                <div key={item.id} className="flex flex-col items-center group">
+                  <div className="w-56 h-56 rounded-full overflow-hidden shadow-lg border-4 border-card group-hover:shadow-2xl group-hover:scale-105 transition-all duration-300 bg-muted">
+                    <img
+                      src={image}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      width={640}
+                      height={640}
+                    />
+                  </div>
+                  <div className="mt-4 text-center">
+                    <h3 className="font-heading font-bold text-lg text-foreground">{item.name}</h3>
+                    <p className="text-primary font-bold mt-1">{formatINR(Number(item.price))}</p>
+                    <div className="flex items-center justify-center gap-1 mt-2">
+                      <span className="text-primary font-semibold">{Number(item.rating ?? 0).toFixed(1)}</span>
+                      <Star className="w-4 h-4 fill-primary text-primary" />
+                    </div>
+                    <button
+                      onClick={() => {
+                        addItem({ name: item.name, price: Number(item.price), image });
+                        toast.success(`${item.name} added to cart`);
+                      }}
+                      className="mt-3 inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold shadow hover:bg-primary/90 transition-all duration-200"
+                    >
+                      <Plus className="w-4 h-4" /> Add to Cart
+                    </button>
+                  </div>
                 </div>
-                <button
-                  onClick={() => {
-                    addItem({ name: item.name, price: item.price, image: item.image });
-                    toast.success(`${item.name} added to cart`);
-                  }}
-                  className="mt-3 inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold shadow hover:bg-primary/90 transition-all duration-200"
-                >
-                  <Plus className="w-4 h-4" /> Add to Cart
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );

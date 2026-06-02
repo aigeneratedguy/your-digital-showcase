@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink, Navigate, Outlet, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard, ShoppingBag, UtensilsCrossed, Users, Settings,
+  LayoutDashboard, ShoppingBag, UtensilsCrossed, Users,
   ArrowLeft, Menu, X, ShieldAlert, PlusCircle,
 } from "lucide-react";
 import { useAdminRole } from "@/hooks/useAdminRole";
@@ -14,7 +14,6 @@ const sidebarItems = [
   { label: "Menu Items", icon: UtensilsCrossed, to: "/admin/menu" },
   { label: "Add Food", icon: PlusCircle, to: "/admin/add-food" },
   { label: "Customers", icon: Users, to: "/admin/customers" },
-  { label: "Settings", icon: Settings, to: "/admin/settings" },
 ];
 
 const titleFor = (pathname: string) => {

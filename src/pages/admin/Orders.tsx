@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Order, Profile, ORDER_STATUSES, statusColor } from "./shared";
+import { formatINR } from "@/lib/format";
 
 type OrderItem = {
   id: string;
@@ -17,11 +18,17 @@ type OrderItem = {
   price: number;
 };
 
+type OrderWithDelivery = Order & {
+  delivery_name: string | null;
+  delivery_mobile: string | null;
+  delivery_address: string | null;
+};
+
 const Orders = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<OrderWithDelivery[]>([]);
   const [loading, setLoading] = useState(true);
   const [detailOpen, setDetailOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<OrderWithDelivery | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [customer, setCustomer] = useState<Profile | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -31,7 +38,7 @@ const Orders = () => {
     setLoading(true);
     const { data, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
     if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
-    setOrders(data || []);
+    setOrders((data as OrderWithDelivery[]) || []);
     setLoading(false);
   };
 
@@ -48,7 +55,7 @@ const Orders = () => {
     }
   };
 
-  const openDetail = async (order: Order) => {
+  const openDetail = async (order: OrderWithDelivery) => {
     setSelectedOrder(order);
     setDetailOpen(true);
     setDetailLoading(true);
@@ -69,7 +76,7 @@ const Orders = () => {
     <>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg">All Orders</CardTitle>
+          <CardTitle className="text-lg">Order History</CardTitle>
           <Badge className="bg-primary/15 text-primary border-primary/30">{orders.length} orders</Badge>
         </CardHeader>
         <CardContent>
@@ -82,8 +89,8 @@ const Orders = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Order ID</TableHead>
+                  <TableHead>Customer</TableHead>
                   <TableHead>Date</TableHead>
-                  <TableHead>Subtotal</TableHead>
                   <TableHead>Total</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -93,9 +100,9 @@ const Orders = () => {
                 {orders.map((o) => (
                   <TableRow key={o.id}>
                     <TableCell className="font-medium">#{o.id.slice(0, 8)}</TableCell>
+                    <TableCell>{o.delivery_name || "—"}</TableCell>
                     <TableCell>{new Date(o.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell>${Number(o.subtotal).toFixed(2)}</TableCell>
-                    <TableCell>${Number(o.total).toFixed(2)}</TableCell>
+                    <TableCell>{formatINR(Number(o.total))}</TableCell>
                     <TableCell>
                       <Select value={o.status} onValueChange={(v) => updateStatus(o.id, v)}>
                         <SelectTrigger className="w-36">
@@ -139,19 +146,19 @@ const Orders = () => {
           ) : (
             <div className="space-y-5 py-2">
               <div>
-                <h3 className="text-sm font-semibold mb-2 text-muted-foreground uppercase tracking-wide">Customer</h3>
+                <h3 className="text-sm font-semibold mb-2 text-muted-foreground uppercase tracking-wide">Delivery To</h3>
                 <div className="space-y-2 text-sm bg-muted/40 rounded-lg p-4">
                   <div className="flex items-start gap-2">
                     <User className="w-4 h-4 mt-0.5 text-primary" />
-                    <span className="font-medium">{customer?.name || "—"}</span>
+                    <span className="font-medium">{selectedOrder.delivery_name || customer?.name || "—"}</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Phone className="w-4 h-4 mt-0.5 text-primary" />
-                    <span>{customer?.mobile || "—"}</span>
+                    <span>{selectedOrder.delivery_mobile || customer?.mobile || "—"}</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <MapPin className="w-4 h-4 mt-0.5 text-primary" />
-                    <span>{customer?.address || "—"}</span>
+                    <span>{selectedOrder.delivery_address || customer?.address || "—"}</span>
                   </div>
                 </div>
               </div>
@@ -175,8 +182,8 @@ const Orders = () => {
                         <TableRow key={it.id}>
                           <TableCell className="font-medium">{it.menu_item_name}</TableCell>
                           <TableCell className="text-center">{it.quantity}</TableCell>
-                          <TableCell className="text-right">${Number(it.price).toFixed(2)}</TableCell>
-                          <TableCell className="text-right">${(Number(it.price) * it.quantity).toFixed(2)}</TableCell>
+                          <TableCell className="text-right">{formatINR(Number(it.price))}</TableCell>
+                          <TableCell className="text-right">{formatINR(Number(it.price) * it.quantity)}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -185,10 +192,10 @@ const Orders = () => {
               </div>
 
               <div className="space-y-1 text-sm border-t pt-4">
-                <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>${Number(selectedOrder.subtotal).toFixed(2)}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Tax</span><span>${Number(selectedOrder.tax).toFixed(2)}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Delivery</span><span>${Number(selectedOrder.delivery_fee).toFixed(2)}</span></div>
-                <div className="flex justify-between font-bold text-base pt-2 border-t"><span>Total</span><span>${Number(selectedOrder.total).toFixed(2)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>{formatINR(Number(selectedOrder.subtotal))}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Tax</span><span>{formatINR(Number(selectedOrder.tax))}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Delivery</span><span>{formatINR(Number(selectedOrder.delivery_fee))}</span></div>
+                <div className="flex justify-between font-bold text-base pt-2 border-t"><span>Total</span><span>{formatINR(Number(selectedOrder.total))}</span></div>
               </div>
             </div>
           )}

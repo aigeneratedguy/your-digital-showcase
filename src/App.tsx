@@ -15,7 +15,6 @@ import AdminOrders from "./pages/admin/Orders.tsx";
 import AdminMenuItems from "./pages/admin/MenuItems.tsx";
 import AdminAddFood from "./pages/admin/AddFood.tsx";
 import AdminCustomers from "./pages/admin/Customers.tsx";
-import AdminSettings from "./pages/admin/AdminSettings.tsx";
 import AdminSignIn from "./pages/AdminSignIn.tsx";
 import AdminSignUp from "./pages/AdminSignUp.tsx";
 import About from "./pages/About.tsx";
@@ -47,7 +46,6 @@ const App = () => (
                 <Route path="menu" element={<AdminMenuItems />} />
                 <Route path="add-food" element={<AdminAddFood />} />
                 <Route path="customers" element={<AdminCustomers />} />
-                <Route path="settings" element={<AdminSettings />} />
               </Route>
               <Route path="/about" element={<About />} />
               <Route path="/team" element={<Team />} />
