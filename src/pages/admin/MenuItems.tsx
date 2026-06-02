@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { MenuItem, emptyFoodForm } from "./shared";
+import { formatINR } from "@/lib/format";
 
 const MenuItems = () => {
   const [items, setItems] = useState<MenuItem[]>([]);
@@ -99,7 +100,7 @@ const MenuItems = () => {
                 <Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
               </div>
               <div>
-                <Label>Price</Label>
+                <Label>Price (₹)</Label>
                 <Input type="number" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
               </div>
               <div>
@@ -139,7 +140,7 @@ const MenuItems = () => {
                 <TableRow key={item.id}>
                   <TableCell className="font-medium">{item.name}</TableCell>
                   <TableCell>{item.category}</TableCell>
-                  <TableCell>${Number(item.price).toFixed(2)}</TableCell>
+                  <TableCell>{formatINR(Number(item.price))}</TableCell>
                   <TableCell>
                     <Switch checked={!!item.available} onCheckedChange={() => toggleAvailable(item)} />
                   </TableCell>

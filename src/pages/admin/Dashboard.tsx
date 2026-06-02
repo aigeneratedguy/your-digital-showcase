@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Order, statusColor } from "./shared";
+import { formatINR } from "@/lib/format";
 
 const Dashboard = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -24,7 +25,7 @@ const Dashboard = () => {
 
   const stats = [
     { label: "Total Orders", value: String(orders.length), icon: ShoppingBag },
-    { label: "Revenue", value: `$${revenue.toFixed(2)}`, icon: TrendingUp },
+    { label: "Revenue", value: formatINR(revenue), icon: TrendingUp },
     { label: "Pending Orders", value: String(pending), icon: Clock },
     { label: "Customers", value: String(customerCount), icon: Users },
   ];
@@ -67,7 +68,7 @@ const Dashboard = () => {
                   <TableRow key={o.id}>
                     <TableCell className="font-medium">#{o.id.slice(0, 8)}</TableCell>
                     <TableCell>{new Date(o.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell>${Number(o.total).toFixed(2)}</TableCell>
+                    <TableCell>{formatINR(Number(o.total))}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className={statusColor(o.status)}>{o.status}</Badge>
                     </TableCell>

@@ -59,8 +59,8 @@ const AddFood = () => {
               <Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} placeholder="Pizza" />
             </div>
             <div>
-              <Label>Price ($)</Label>
-              <Input type="number" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="9.99" />
+              <Label>Price (₹)</Label>
+              <Input type="number" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="299" />
             </div>
             <div>
               <Label>Image URL</Label>

@@ -1,15 +1,16 @@
-import { ShoppingCart, Plus, Minus, Trash2, X } from "lucide-react";
+import { ShoppingCart, Plus, Minus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
+import { formatINR } from "@/lib/format";
 
 const CartDrawer = () => {
   const { items, updateQty, removeItem, clearCart, totalItems, subtotal, isOpen, setIsOpen } = useCart();
   const tax = subtotal * 0.08;
-  const deliveryFee = items.length > 0 ? 3.99 : 0;
+  const deliveryFee = items.length > 0 ? 49 : 0;
   const total = subtotal + tax + deliveryFee;
 
   return (
@@ -45,7 +46,7 @@ const CartDrawer = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground text-sm truncate">{item.name}</p>
-                    <p className="text-primary font-semibold text-sm">${item.price.toFixed(2)}</p>
+                    <p className="text-primary font-semibold text-sm">{formatINR(item.price)}</p>
                   </div>
                   <div className="flex items-center gap-1">
                     <button onClick={() => updateQty(item.name, item.qty - 1)} className="w-7 h-7 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors">
@@ -65,22 +66,22 @@ const CartDrawer = () => {
 
             <div className="border-t border-border pt-4 space-y-2">
               <div className="flex justify-between text-sm text-muted-foreground">
-                <span>Subtotal</span><span>${subtotal.toFixed(2)}</span>
+                <span>Subtotal</span><span>{formatINR(subtotal)}</span>
               </div>
               <div className="flex justify-between text-sm text-muted-foreground">
-                <span>Tax (8%)</span><span>${tax.toFixed(2)}</span>
+                <span>Tax (8%)</span><span>{formatINR(tax)}</span>
               </div>
               <div className="flex justify-between text-sm text-muted-foreground">
-                <span>Delivery Fee</span><span>${deliveryFee.toFixed(2)}</span>
+                <span>Delivery Fee</span><span>{formatINR(deliveryFee)}</span>
               </div>
               <Separator />
               <div className="flex justify-between font-bold text-lg text-foreground">
-                <span>Total</span><span>${total.toFixed(2)}</span>
+                <span>Total</span><span>{formatINR(total)}</span>
               </div>
               <div className="flex gap-2 pt-2">
                 <Button variant="outline" size="sm" onClick={clearCart} className="flex-1">Clear</Button>
                 <Button asChild className="flex-1">
-                  <Link to="/order-confirmation" onClick={() => setIsOpen(false)}>Place Order</Link>
+                  <Link to="/order-confirmation" onClick={() => setIsOpen(false)}>Checkout</Link>
                 </Button>
               </div>
             </div>
