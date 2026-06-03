@@ -1,17 +1,31 @@
 import { ShoppingCart, Plus, Minus, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import { formatINR } from "@/lib/format";
 
 const CartDrawer = () => {
   const { items, updateQty, removeItem, clearCart, totalItems, subtotal, isOpen, setIsOpen } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const tax = subtotal * 0.08;
   const deliveryFee = items.length > 0 ? 49 : 0;
   const total = subtotal + tax + deliveryFee;
+
+  const handleCheckout = () => {
+    setIsOpen(false);
+    if (!user) {
+      toast.info("Please sign in to checkout and add your delivery details.");
+      navigate("/signin");
+      return;
+    }
+    navigate("/order-confirmation");
+  };
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -80,8 +94,8 @@ const CartDrawer = () => {
               </div>
               <div className="flex gap-2 pt-2">
                 <Button variant="outline" size="sm" onClick={clearCart} className="flex-1">Clear</Button>
-                <Button asChild className="flex-1">
-                  <Link to="/order-confirmation" onClick={() => setIsOpen(false)}>Checkout</Link>
+                <Button onClick={handleCheckout} className="flex-1">
+                  {user ? "Checkout" : "Sign in to Checkout"}
                 </Button>
               </div>
             </div>
