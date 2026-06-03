@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Star, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -106,10 +106,6 @@ const MenuSection = () => {
                   <div className="mt-4 text-center">
                     <h3 className="font-heading font-bold text-lg text-foreground">{item.name}</h3>
                     <p className="text-primary font-bold mt-1">{formatINR(Number(item.price))}</p>
-                    <div className="flex items-center justify-center gap-1 mt-2">
-                      <span className="text-primary font-semibold">{Number(item.rating ?? 0).toFixed(1)}</span>
-                      <Star className="w-4 h-4 fill-primary text-primary" />
-                    </div>
                     <button
                       onClick={() => {
                         addItem({ name: item.name, price: Number(item.price), image });
